@@ -1,0 +1,62 @@
+# =========================
+# Go
+# =========================
+
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build directories
+bin/
+dist/
+build/
+
+# Coverage
+coverage.out
+coverage.html
+*.coverprofile
+
+# Go workspace
+go.work.sum
+
+# =========================
+# Environment
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDEs
+# =========================
+
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+
+*.log
+
+# =========================
+# Temporary files
+# =========================
+
+tmp/
+temp/
