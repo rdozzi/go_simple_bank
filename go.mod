@@ -1,6 +1,6 @@
 module github.com/rdozzi/simple_bank
 
-go 1.26.5
+go 1.26
 
 require github.com/lib/pq v1.12.3
 
