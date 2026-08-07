@@ -28,6 +28,7 @@ go.work.sum
 # Environment
 # =========================
 
+app.env
 .env
 .env.*
 !.env.example
