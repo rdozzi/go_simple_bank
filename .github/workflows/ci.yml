@@ -37,9 +37,6 @@ jobs:
           go-version: '1.26'
         id: go
 
-      - name: Check out code into the Go module directory
-        run: actions/checkout@v4
-
       - name: Run migrations
         run: make migrateup
 
