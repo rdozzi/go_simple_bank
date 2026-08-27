@@ -46,7 +46,8 @@ jobs:
         run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
 
       - name: Create app.env
-        run: cat > app.env <<EOF
+        run: |
+          cat > app.env <<EOF
           DB_DRIVER=postgres
           DB_SOURCE=postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable
           SERVER_ADDRESS=0.0.0.0:8080
