@@ -24,6 +24,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Create app.env
+        run: |
+          cat > app.env <<EOF
+          DB_DRIVER=postgres
+          DB_SOURCE=${{ secrets.DB_SOURCE }}
+          SERVER_ADDRESS=0.0.0.0:8080
+          TOKEN_SYMMETRIC_KEY=${{ secrets.TOKEN_SYMMETRIC_KEY }}
+          ACCESS_TOKEN_DURATION=15m
+          EOF
+
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
