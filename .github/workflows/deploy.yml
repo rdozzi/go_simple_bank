@@ -56,8 +56,8 @@ jobs:
       - name: Configure kubectl for Amazon EKS
         run: |
           aws eks update-kubeconfig \
-          -- region us-east-1 \
-          -- name simple-bank
+          --region us-east-1 \
+          --name simple-bank
 
       - name: Deploy Kubernetes resources
         run: |
