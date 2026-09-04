@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-bank-ingress
+  # annotations:
+  #   cert-manage.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: traefik
+  rules:
+    # - host: 'a6222933a625f49ea8713ec48d2e8c27-2046749486.us-east-1.elb.amazonaws.com'
+    - http:
+        paths:
+          - pathType: Prefix
+            path: '/'
+            backend:
+              service:
+                name: simple-bank-api-service
+                port:
+                  number: 80
+# tls:
+#   - hosts:
+#       # -
+#     secretName: simple-bank-api-cert
