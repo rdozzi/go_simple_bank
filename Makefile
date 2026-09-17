@@ -11,27 +11,27 @@ dropdb:
 	docker exec -it postgres18 dropdb simple_bank
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
-
-migrateup-rds: 
-	migrate -path db/migration -database "$(RDS_DB_SOURCE)" -verbose up
+	migrate -path db/migration -database "$(LOCAL_DB_SOURCE)" -verbose up
 
 migrateup1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up 1
+	migrate -path db/migration -database "$(LOCAL_DB_SOURCE)" -verbose up 1
 
 migratedown:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+	migrate -path db/migration -database "$(LOCAL_DB_SOURCE)" -verbose down
 
 migratedown1:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down 1
+	migrate -path db/migration -database "$(LOCAL_DB_SOURCE)" -verbose down 1
+
+migrateup-rds:
+	migrate -path db/migration -database "$(RDS_DB_SOURCE)" -verbose up
 
 dbdocs:
-  dbdocs build doc/db.dbml
+	dbdocs build doc/db.dbml
 
 db_schema:
-  dbml2sql --postgres -o doc/schema.sql doc/db.dbml
+	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
 
-sqlc: 
+sqlc:
 	sqlc generate
 
 test:
