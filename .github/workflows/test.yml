@@ -56,6 +56,8 @@ jobs:
           EOF
 
       - name: Run migrations
+        env:
+          LOCAL_DB_SOURCE: ${{secrets.LOCAL_DB_SOURCE}}
         run: make migrateup
 
       - name: Test
