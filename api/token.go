@@ -77,11 +77,6 @@ func (server *Server) renewAccessToken(ctx *gin.Context){
 		return
 	}
 
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
 	rsp := renewAccessTokenResponse{
 		AccessToken: accessToken,
 		AccessTokenExpiresAt: accessPayload.ExpiresAt.Time,
