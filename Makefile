@@ -1,13 +1,13 @@
 include app.env
 export
 
-postgres: 
+postgres:
 	docker run -p 5432:5432 --name postgres18 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:18
 
-createdb: 
+createdb:
 	docker exec -it postgres18 createdb --username=root simple_bank
 
-dropdb: 
+dropdb:
 	docker exec -it postgres18 dropdb simple_bank
 
 migrateup:
