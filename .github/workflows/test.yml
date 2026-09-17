@@ -57,7 +57,7 @@ jobs:
 
       - name: Run migrations
         env:
-          LOCAL_DB_SOURCE: $ {{secrets.LOCAL_DB_SOURCE}}
+          LOCAL_DB_SOURCE: ${{secrets.LOCAL_DB_SOURCE}}
         run: make migrateup
 
       - name: Test
