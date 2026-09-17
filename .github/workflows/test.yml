@@ -57,10 +57,12 @@ jobs:
 
       - name: Run migrations
         run: |
+          cat > app.env <<EOF
           set -a
           source app.env
           set +a
           make migrateup
+          EOF
 
       - name: Test
         run: make test
