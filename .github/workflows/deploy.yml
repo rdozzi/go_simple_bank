@@ -6,6 +6,8 @@ on:
 
 jobs:
   deploy:
+    # AWS connections were deactivated in 09/26. Set the "if" statement to true if AWS is reactivated.
+    if: ${{ false }}
     name: Build and Deploy
     runs-on: ubuntu-latest
 
