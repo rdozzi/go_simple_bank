@@ -56,7 +56,11 @@ jobs:
           EOF
 
       - name: Run migrations
-        run: make migrateup
+        run: |
+          set -a
+          source app.env
+          set +a
+          make migrateup
 
       - name: Test
         run: make test
