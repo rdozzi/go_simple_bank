@@ -5,6 +5,7 @@ go 1.26
 tool (
 	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+	github.com/rakyll/statik
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
@@ -17,6 +18,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/lib/pq v1.12.3
 	github.com/o1egl/paseto v1.0.0
+	github.com/rakyll/statik v0.1.8
 	github.com/spf13/viper v1.21.0
 	go.uber.org/mock v0.6.0
 	golang.org/x/crypto v0.55.0
