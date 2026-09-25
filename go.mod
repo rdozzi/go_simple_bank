@@ -6,6 +6,7 @@ tool (
 	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 	github.com/rakyll/statik
+	google.golang.org/genproto/googleapis/rpc/errdetails
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
