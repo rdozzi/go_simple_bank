@@ -1,0 +1,19 @@
+edition = "2024";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/rdozzi/simple_bank/pb";
+
+message UpdateUserRequest {
+  string username = 1;
+  string full_name = 2 [features.field_presence = EXPLICIT];
+  string email = 3 [features.field_presence = EXPLICIT];
+  string password = 4 [features.field_presence = EXPLICIT];
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
+
