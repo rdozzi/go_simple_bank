@@ -28,12 +28,16 @@ import (
 )
 
 func main(){
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	
+
 	config, err := util.LoadConfig(".")
 	if err != nil{
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
+
+	if config.Environment ==  "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+
 	conn, err := sql.Open(config.DBDriver,config.DBSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db:")
