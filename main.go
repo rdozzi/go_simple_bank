@@ -63,7 +63,8 @@ func runGrpcServer(config util.Config, store db.Store){
 		log.Fatal("cannot create serfer:", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterSimpleBankServer(grpcServer,server)
 	reflection.Register(grpcServer)
 
