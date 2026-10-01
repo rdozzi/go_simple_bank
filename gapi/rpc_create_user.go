@@ -3,7 +3,9 @@ package gapi
 import (
 	"context"
 	"log"
+	"time"
 
+	"github.com/hibiken/asynq"
 	"github.com/lib/pq"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
 	"github.com/rdozzi/simple_bank/db/util"
@@ -53,7 +55,14 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	taskPayload := &worker.PayloadSendVerifyEmail{
 		Username: user.Username,
 	}
-	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx,taskPayload)
+
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(10*time.Second),
+		asynq.Queue(worker.QueueCritical),
+	}
+
+	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx,taskPayload,opts...)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to distribute task to send verifying email: %s", err)
 	}
