@@ -9,6 +9,7 @@ import (
 	"github.com/rdozzi/simple_bank/db/util"
 	"github.com/rdozzi/simple_bank/pb"
 	"github.com/rdozzi/simple_bank/val"
+	"github.com/rdozzi/simple_bank/worker"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,6 +45,17 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 			}
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
+	}
+
+	// TODO: Use db transaction to both create user and send email
+
+	// Send verify email to user
+	taskPayload := &worker.PayloadSendVerifyEmail{
+		Username: user.Username,
+	}
+	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx,taskPayload)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to distribute task to send verifying email: %s", err)
 	}
 
 	rsp := (&pb.CreateUserResponse_builder{
