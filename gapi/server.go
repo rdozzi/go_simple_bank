@@ -8,6 +8,7 @@ import (
 	"github.com/rdozzi/simple_bank/db/util"
 	"github.com/rdozzi/simple_bank/pb"
 	"github.com/rdozzi/simple_bank/token"
+	"github.com/rdozzi/simple_bank/worker"
 )
 
 // Server serves gRPC requests for our banking service
@@ -17,10 +18,11 @@ type Server struct {
 	store db.Store
 	tokenMaker token.Maker
 	router *gin.Engine
+	taskDistributor worker.TaskDistributor
 }
 
 // NewServer creates a new gRPC server.
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	// tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -31,6 +33,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		config: config,
 		store: store, 
 		tokenMaker: tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 	 
 	return server, nil
