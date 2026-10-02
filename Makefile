@@ -25,6 +25,9 @@ migratedown1:
 migrateup-rds:
 	migrate -path db/migration -database "$(RDS_DB_SOURCE)" -verbose up
 
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 dbdocs:
 	dbdocs build doc/db.dbml
 
