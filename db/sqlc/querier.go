@@ -17,6 +17,7 @@ type Querier interface {
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Sessions, error)
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfers, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (Users, error)
+	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmails, error)
 	DeleteAccount(ctx context.Context, id int64) error
 	GetAccount(ctx context.Context, id int64) (Accounts, error)
 	// Add NO KEY to tell Postgres that you won't have to acquire a lock
