@@ -20,6 +20,7 @@ import (
 	"github.com/rdozzi/simple_bank/db/util"
 	_ "github.com/rdozzi/simple_bank/doc/statik"
 	"github.com/rdozzi/simple_bank/gapi"
+	"github.com/rdozzi/simple_bank/mail"
 	"github.com/rdozzi/simple_bank/pb"
 	"github.com/rdozzi/simple_bank/worker"
 	"github.com/rs/zerolog"
@@ -58,7 +59,7 @@ func main(){
 	}
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	go runTaskProcessor(redisOpt,store)
+	go runTaskProcessor(config,redisOpt,store)
 
 	// Start Gin/gRPC gateway server
 	// runGinServer(config,store)
@@ -80,8 +81,9 @@ func runDBMigration(migrationURL string, dbSource string){
 		log.Info().Msg("db migrated successfully")
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store){
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt,store)
+func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store){
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt,store, mailer)
 	log.Info().Msg("start task processor")
 	err := taskProcessor.Start()
 	if err != nil{
