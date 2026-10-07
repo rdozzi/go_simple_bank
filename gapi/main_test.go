@@ -1,13 +1,17 @@
 package gapi
 
 import (
+	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	db "github.com/rdozzi/simple_bank/db/sqlc"
 	"github.com/rdozzi/simple_bank/db/util"
+	"github.com/rdozzi/simple_bank/token"
 	"github.com/rdozzi/simple_bank/worker"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 )
 
 func newTestServer(t *testing.T, store db.Store, taskDistributor worker.TaskDistributor) *Server {
@@ -21,3 +25,16 @@ func newTestServer(t *testing.T, store db.Store, taskDistributor worker.TaskDist
 
 	return server
 }
+
+func newContextWithBearerToken(t *testing.T,tokenMaker token.Maker,username string,duration time.Duration) context.Context {
+				ctx := context.Background()
+				accessToken, _, err := tokenMaker.CreateToken(username, duration)
+				require.NoError(t,err)
+				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
+				md := metadata.MD{
+					authorizationHeader: []string{
+						bearerToken,
+					},
+				}
+				return metadata.NewIncomingContext(ctx,md)
+			}

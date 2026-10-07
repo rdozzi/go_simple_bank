@@ -3,7 +3,6 @@ package gapi
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
@@ -14,7 +13,8 @@ import (
 	"github.com/rdozzi/simple_bank/token"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestUpdateUserAPI(t *testing.T){
@@ -22,6 +22,7 @@ func TestUpdateUserAPI(t *testing.T){
 
 	newName := util.RandomOwner()
 	newEmail := util.RandomEmail()
+	invalidEmail := "invalid-email"
 
 
 	testCases := []struct {
@@ -62,16 +63,7 @@ func TestUpdateUserAPI(t *testing.T){
 				store.EXPECT().UpdateUser(gomock.Any(), gomock.Eq(arg)).Times(1).Return(updatedUser,nil)
 			},
 			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
-				ctx := context.Background()
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t,err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(ctx,md)
+				return newContextWithBearerToken(t,tokenMaker,user.Username,time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error){
 				require.NoError(t,err)
@@ -80,6 +72,86 @@ func TestUpdateUserAPI(t *testing.T){
 				require.Equal(t,user.Username,updatedUser.GetUsername())
 				require.Equal(t,newName,updatedUser.GetFullName())
 				require.Equal(t,newEmail,updatedUser.GetEmail())
+			},
+		},
+		{
+			name: "UserNotFound",
+			req: (&pb.UpdateUserRequest_builder{
+				Username: &user.Username,
+				FullName: &newName,
+				Email: &newEmail,
+			}).Build(),
+			buildStubs: func(store *mockdb.MockStore){
+				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(1).Return(db.Users{},sql.ErrNoRows)
+			},
+			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t,tokenMaker,user.Username,time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error){
+				require.Error(t,err)
+				st, ok := status.FromError(err)
+				require.True(t,ok)
+				require.Equal(t,codes.NotFound,st.Code())
+			},
+		},
+		{
+			name: "ExpiredToken",
+			req: (&pb.UpdateUserRequest_builder{
+				Username: &user.Username,
+				FullName: &newName,
+				Email: &newEmail,
+			}).Build(),
+			buildStubs: func(store *mockdb.MockStore){
+				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(0)
+			},
+			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t,tokenMaker,user.Username,-time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error){
+				require.Error(t,err)
+				st, ok := status.FromError(err)
+				require.True(t,ok)
+				require.Equal(t,codes.Unauthenticated,st.Code())
+			},
+		},
+		{
+			name: "NoAuthorization",
+			req: (&pb.UpdateUserRequest_builder{
+				Username: &user.Username,
+				FullName: &newName,
+				Email: &newEmail,
+			}).Build(),
+			buildStubs: func(store *mockdb.MockStore){
+				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(0)
+			},
+			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
+				return context.Background()
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error){
+				require.Error(t,err)
+				st, ok := status.FromError(err)
+				require.True(t,ok)
+				require.Equal(t,codes.Unauthenticated,st.Code())
+			},
+		},
+		{
+			name: "InvalidEmail",
+			req: (&pb.UpdateUserRequest_builder{
+				Username: &user.Username,
+				FullName: &newName,
+				Email: &invalidEmail,
+			}).Build(),
+			buildStubs: func(store *mockdb.MockStore){
+				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(0)
+			},
+			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t,tokenMaker,user.Username,time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error){
+				require.Error(t,err)
+				st, ok := status.FromError(err)
+				require.True(t,ok)
+				require.Equal(t,codes.InvalidArgument,st.Code())
 			},
 		},
 	}
