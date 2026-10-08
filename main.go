@@ -3,7 +3,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"net"
 	"net/http"
 	"os"
@@ -13,7 +12,8 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hibiken/asynq"
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rakyll/statik/fs"
 	"github.com/rdozzi/simple_bank/api"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
@@ -43,14 +43,14 @@ func main(){
 	}
 
 	// Load Postgres with Migration
-	conn, err := sql.Open(config.DBDriver,config.DBSource)
+	connPool, err := pgxpool.New(context.Background(),config.DBSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db:")
 	}
 
 	runDBMigration(config.MigrationURL,config.DBSource)
 
-	store := db.NewStore(conn)
+	store := db.NewStore(connPool)
 
 	// Start Redis
 	redisOpt := asynq.RedisClientOpt{

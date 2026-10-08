@@ -1,14 +1,12 @@
 package api
 
 import (
-	"database/sql"
-	"log"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
 	"github.com/rdozzi/simple_bank/db/util"
 )
@@ -61,13 +59,9 @@ func (server *Server) createUser(ctx *gin.Context){
 
 	user, err := server.store.CreateUser(ctx,arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			log.Println(pqErr.Code.Name())
-			switch pqErr.Code.Name(){
-			case "unique_violation":
+		if db.ErrorCode(err) == db.UniqueViolation {
 				ctx.JSON(http.StatusForbidden, errorResponse(err))
 				return
-			}
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse((err)))
 		return
@@ -101,7 +95,7 @@ func (server *Server) loginUser(ctx *gin.Context){
 
 	user, err := server.store.GetUser(ctx, req.Username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err,db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 		}
 
