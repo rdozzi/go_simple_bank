@@ -53,7 +53,7 @@ package api
 // 				name:"NotFound",
 // 				accountID: account.ID,
 // 				buildStubs: func(store *mockdb.MockStore){
-// 					store.EXPECT().GetAccount(gomock.Any(),gomock.Eq(account.ID)).Times(1).Return(db.Accounts{},sql.ErrNoRows)
+// 					store.EXPECT().GetAccount(gomock.Any(),gomock.Eq(account.ID)).Times(1).Return(db.Accounts{},db.ErrRecordNotFound)
 // 				},
 // 				checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder){
 // 					require.Equal(t,http.StatusNotFound,recorder.Code)
