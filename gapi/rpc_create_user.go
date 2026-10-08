@@ -2,11 +2,12 @@ package gapi
 
 import (
 	"context"
-	"log"
+	"errors"
 	"time"
 
 	"github.com/hibiken/asynq"
-	"github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
 	"github.com/rdozzi/simple_bank/db/util"
 	"github.com/rdozzi/simple_bank/pb"
@@ -54,11 +55,11 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 
 	txResult, err := server.store.CreateUserTx(ctx,arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			log.Println(pqErr.Code.Name())
-			switch pqErr.Code.Name(){
-			case "unique_violation":
-				return nil, status.Errorf(codes.AlreadyExists, "username already exists: %s", err)
+		var pgErr *pgconn.PgError
+
+		if errors.As(err, &pgErr){
+			if db.ErrorCode(err) == db.UniqueViolation {
+				return nil, status.Errorf(codes.AlreadyExists, "%s alredy exists: %s", pgErr.ConstraintName,err)
 			}
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)

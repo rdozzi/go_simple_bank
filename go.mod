@@ -18,7 +18,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
-	github.com/lib/pq v1.12.3
+	github.com/lib/pq v1.12.3 // indirect
 	github.com/o1egl/paseto v1.0.0
 	github.com/rakyll/statik v0.1.8
 	github.com/rs/zerolog v1.35.1

@@ -2,10 +2,10 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	mockdb "github.com/rdozzi/simple_bank/db/mock"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
 	"github.com/rdozzi/simple_bank/db/util"
@@ -42,11 +42,11 @@ func TestUpdateUserAPI(t *testing.T){
 			buildStubs: func(store *mockdb.MockStore){
 				arg := db.UpdateUserParams{
 					Username: user.Username,
-					FullName: sql.NullString{
+					FullName: pgtype.Text{
 						String: newName,
 						Valid: true,
 					},
-					Email: sql.NullString{
+					Email: pgtype.Text{
 						String: newEmail,
 						Valid: true,
 					},
@@ -82,7 +82,7 @@ func TestUpdateUserAPI(t *testing.T){
 				Email: &newEmail,
 			}).Build(),
 			buildStubs: func(store *mockdb.MockStore){
-				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(1).Return(db.Users{},sql.ErrNoRows)
+				store.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Times(1).Return(db.Users{},db.ErrRecordNotFound)
 			},
 			buildContext: func(t *testing.T,tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t,tokenMaker,user.Username,time.Minute)
