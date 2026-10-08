@@ -22,7 +22,7 @@ type AddAccountBalanceParams struct {
 }
 
 func (q *Queries) AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, addAccountBalance, arg.Amount, arg.ID)
+	row := q.db.QueryRow(ctx, addAccountBalance, arg.Amount, arg.ID)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,
@@ -50,7 +50,7 @@ type CreateAccountParams struct {
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, createAccount, arg.Owner, arg.Balance, arg.Currency)
+	row := q.db.QueryRow(ctx, createAccount, arg.Owner, arg.Balance, arg.Currency)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,
@@ -67,7 +67,7 @@ DELETE FROM accounts WHERE id = $1
 `
 
 func (q *Queries) DeleteAccount(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteAccount, id)
+	_, err := q.db.Exec(ctx, deleteAccount, id)
 	return err
 }
 
@@ -78,7 +78,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetAccount(ctx context.Context, id int64) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, getAccount, id)
+	row := q.db.QueryRow(ctx, getAccount, id)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,
@@ -99,7 +99,7 @@ FOR NO KEY UPDATE
 
 // Add NO KEY to tell Postgres that you won't have to acquire a lock
 func (q *Queries) GetAccountForUpdate(ctx context.Context, id int64) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, getAccountForUpdate, id)
+	row := q.db.QueryRow(ctx, getAccountForUpdate, id)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,
@@ -126,7 +126,7 @@ type ListAccountParams struct {
 }
 
 func (q *Queries) ListAccount(ctx context.Context, arg ListAccountParams) ([]Accounts, error) {
-	rows, err := q.db.QueryContext(ctx, listAccount, arg.Owner, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listAccount, arg.Owner, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +144,6 @@ func (q *Queries) ListAccount(ctx context.Context, arg ListAccountParams) ([]Acc
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -167,7 +164,7 @@ type UpdateAccountParams struct {
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.Balance)
+	row := q.db.QueryRow(ctx, updateAccount, arg.ID, arg.Balance)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,

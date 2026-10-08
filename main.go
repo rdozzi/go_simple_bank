@@ -14,6 +14,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5"
 	"github.com/rakyll/statik/fs"
 	"github.com/rdozzi/simple_bank/api"
 	db "github.com/rdozzi/simple_bank/db/sqlc"
