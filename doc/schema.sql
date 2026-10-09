@@ -1,9 +1,10 @@
 -- SQL dump generated using DBML (dbml.dbdiagram.io)
 -- Database: PostgreSQL
--- Generated at: 2026-10-02T17:27:34.003Z
+-- Generated at: 2026-10-08T23:05:23.069Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY,
+  "role" varchar NOT NULL DEFAULT 'depositor',
   "hashed_password" varchar NOT NULL,
   "full_name" varchar NOT NULL,
   "email" varchar UNIQUE NOT NULL,

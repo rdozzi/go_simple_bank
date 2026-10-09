@@ -17,18 +17,18 @@ import (
 
 func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 
-	authPayload, err := server.authorizeUser(ctx)
+	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
-	}
-
-	if authPayload.Username != req.GetUsername() {
-		return nil, status.Errorf(codes.PermissionDenied, "cannot update other user's info")
 	}
 
 	violations := validateUpdateUserRequest(req)
 	if violations != nil {
 		return nil, InvalidArgumentError(violations)
+	}
+
+	if authPayload.Role != util.BankerRole && authPayload.Username != req.GetUsername() {
+		return nil, status.Errorf(codes.PermissionDenied, "cannot update other user's info")
 	}
 
 	arg := db.UpdateUserParams{
