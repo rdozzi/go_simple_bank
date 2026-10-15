@@ -12,6 +12,7 @@ import (
 type Config struct { 
 	DBSource string `mapstructure:"DB_SOURCE"`
 	Environment string `mapstructure:"ENVIRONMENT"`
+	AllowedOrigins []string `mapstructure:"ALLOWED_ORIGINS"`
 	MigrationURL string `mapstructure:"MIGRATION_URL"`
 	RedisAddress string `mapstructure:"REDIS_ADDRESS"`
 	HTTPServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`

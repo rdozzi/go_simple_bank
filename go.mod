@@ -87,6 +87,7 @@ require (
 	github.com/hibiken/asynq v0.26.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/rs/cors v1.11.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/sync v0.22.0
 )
